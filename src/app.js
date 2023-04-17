@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { text } from 'express'
 import cors from 'cors'
 import { MongoClient } from "mongodb"
 import dotenv from 'dotenv'
@@ -104,7 +104,7 @@ app.post("/messages", async (req, res) => {
 app.get("/messages",async (req, res) => {
     const from = req.headers.user
     const { limit } = req.query
-    const msgLimit = []
+    let msgLimit = {}
     
     try{
         const lst = await db.collection("messages").find({
@@ -123,7 +123,14 @@ app.get("/messages",async (req, res) => {
                 cont = lst.length
             }
             for(let i=0;i < cont ;i++){
-                msgLimit.push(lst[lst.length -1])
+                let objeto = {
+                 from:lst[lst.length -1].from,
+                 to:lst[lst.length -1].to,
+                 text:lst[lst.length -1].text,
+                 type:lst[lst.length -1].type  
+                }
+                
+                msgLimit=({...objeto})
                 
             }
             res.status(200).send(msgLimit)
