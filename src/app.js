@@ -104,7 +104,7 @@ app.post("/messages", async (req, res) => {
 app.get("/messages",async (req, res) => {
     const from = req.headers.user
     const { limit } = req.query
-    let msgLimit = {}
+    
     
     try{
         const lst = await db.collection("messages").find({
@@ -117,23 +117,8 @@ app.get("/messages",async (req, res) => {
         if(limit <= 0 || isNaN(limit)) return res.sendStatus(422)
         if (!limit){
             res.status(200).send(lst)
-        } else if(limit){
-            let cont = limit
-            if(limit > lst.length ){
-                cont = lst.length
-            }
-            for(let i=0;i < cont ;i++){
-                let objeto = {
-                 from:lst[lst.length -1].from,
-                 to:lst[lst.length -1].to,
-                 text:lst[lst.length -1].text,
-                 type:lst[lst.length -1].type  
-                }
-                
-                msgLimit=({...objeto})
-                
-            }
-            res.status(200).send(msgLimit)
+        }else {
+            return res.status(200).send(lst.slice(-Number(limit)));
         } 
     } catch(err){
         res.status(500).send(err.message)
